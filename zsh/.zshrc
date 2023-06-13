@@ -63,7 +63,7 @@ ZSH_THEME="awesomepanda"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+# ZSH_CUSTOM=$HOME/.zsh_custom
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -107,40 +107,11 @@ fi
 #
 # Example aliases
 
-alias zshconfig="$EDITOR ~/.zshrc"
-alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
+# Mooved in ~/.oh-my-zsh/custom/aliases.zsh
 
-alias reload="omz reload"
-alias cl="clear"
-
-function ex-fn {
-  explorer.exe ${1:-.}
-}
-alias ex="ex-fn"
-
-# DotBot
-alias dotbot="$HOME/.dotfiles/install"
-
-# Exa
-# alias ls='exa --group-directories-first --icons'
-# alias l='ls -blF --icons'
-# alias ll='ls -al --icons'
-alias ls='exa --group-directories-first'
-alias l='ls -blF'
-alias ll='ls -al'
-alias llm='ll --sort=modified'
-alias la='ls -abghilmu'
-alias lx='ls -abghilmuHSU@'
-# alias lt='exa -a -T -L=1 --icons'
-alias lt='exa -a -T -L=1'
 
 # NVM Config
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Docker
-function dex-fn {
-  docker exec -it -u $UID $(docker ps --format '{{.Names}}' | grep ${1:-php}) bash
-}
-alias dex="dex-fn"

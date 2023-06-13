@@ -1,0 +1,32 @@
+alias zshconfig="$EDITOR ~/.zshrc"
+alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
+
+alias reload="omz reload"
+alias cl="clear"
+
+function ex-fn {
+  explorer.exe ${1:-.}
+}
+alias ex="ex-fn"
+
+# DotBot
+alias dotbot="$HOME/.dotfiles/install"
+
+# Exa
+# alias ls='exa --group-directories-first --icons'
+# alias l='ls -blF --icons'
+# alias ll='ls -al --icons'
+alias ls='exa --group-directories-first'
+alias l='ls -blF'
+alias ll='ls -al'
+alias llm='ll --sort=modified'
+alias la='ls -abghilmu'
+alias lx='ls -abghilmuHSU@'
+# alias lt='exa -a -T -L=1 --icons'
+alias lt='exa -a -T -L=1'
+
+# Docker
+function dex-fn {
+  docker exec -it -u $UID $(docker ps --format '{{.Names}}' | grep ${1:-php}) bash
+}
+alias dex="dex-fn"
