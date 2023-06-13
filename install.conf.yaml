@@ -7,6 +7,9 @@
 - link:
     ~/.zshrc: zsh/.zshrc
     ~/.oh-my-zsh/custom/aliases.zsh: zsh/.aliases
+    ~/.oh-my-zsh/custom/plugins/jump/jump.plugin.zsh:
+      path: zsh/plugins/.jump
+      create: true
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

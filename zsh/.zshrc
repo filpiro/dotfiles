@@ -76,6 +76,7 @@ plugins=(
   npm
   yarn
   composer
+  jump
   zsh-autosuggestions
 )
 
