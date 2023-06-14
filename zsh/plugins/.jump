@@ -15,4 +15,5 @@ addbookmark-fn(){
 	cd $CURRENTPATH
 }
 
-alias addbookmark="addbookmark-fn"
+# alias addbookmark="addbookmark-fn"
+alias addbm="addbookmark-fn"

@@ -110,6 +110,7 @@ fi
 
 # Mooved in ~/.oh-my-zsh/custom/aliases.zsh
 
+export DOTFILES="$HOME/.dotfiles"
 
 # NVM Config
 export NVM_DIR="$HOME/.nvm"
