@@ -76,7 +76,12 @@ plugins=(
   npm
   yarn
   composer
+  docker-compose
+  progressbar
+  # Custom
   jump
+  random
+  zipping
   zsh-autosuggestions
 )
 

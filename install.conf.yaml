@@ -1,15 +1,18 @@
 - defaults:
     link:
       relink: true
+      force: true
+      create: true
+      glob: true
 
 - clean: ["~"]
 
 - link:
+    ~/.bashrc: bash/.bashrc
     ~/.zshrc: zsh/.zshrc
-    ~/.oh-my-zsh/custom/aliases.zsh: zsh/.aliases
-    ~/.oh-my-zsh/custom/plugins/jump/jump.plugin.zsh:
-      path: zsh/plugins/.jump
-      create: true
+    ~/.oh-my-zsh/custom/:
+      path: zsh/**
+      exclude: [zsh/.zshrc]
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

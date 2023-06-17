@@ -1,7 +1,7 @@
 # alias zshconfig="$EDITOR ~/.zshrc"
 # alias zshconfig="$EDITOR $DOTFILES/zsh/"
 
-alias dotfile="$EDITOR $DOTFILES/"
+alias dfconfig="$EDITOR $DOTFILES"
 alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
 
 alias reload="omz reload"
@@ -13,7 +13,12 @@ function ex-fn {
 alias ex="ex-fn"
 
 # DotBot
-alias dotbot="$HOME/.dotfiles/install"
+function dotbot-fn {
+  $HOME/.dotfiles/install
+  echo "Reloading..."
+  omz reload
+}
+alias dotbot="dotbot-fn"
 
 # Exa
 # alias ls='exa --group-directories-first --icons'
@@ -33,3 +38,8 @@ function dex-fn {
   docker exec -it -u $UID $(docker ps --format '{{.Names}}' | grep ${1:-php}) bash
 }
 alias dex="dex-fn"
+
+function dev-fn(){
+  code . | docker compose up -d
+}
+alias dev="dev-fn"
