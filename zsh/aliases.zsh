@@ -22,3 +22,8 @@ function dotbot-fn {
   omz reload
 }
 alias dotbot="dotbot-fn"
+
+function dev-fn(){
+  code . | docker compose up -d
+}
+alias dev="dev-fn"
