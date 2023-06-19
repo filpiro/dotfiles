@@ -1,7 +1,7 @@
 # alias zshconfig="$EDITOR ~/.zshrc"
 # alias zshconfig="$EDITOR $DOTFILES/zsh/"
 
-alias dfconfig="$EDITOR $DOTFILES"
+alias dfconfig="$EDITOR ~/.dotfiles"
 alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
 
 alias reload="omz reload"

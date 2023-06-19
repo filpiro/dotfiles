@@ -77,7 +77,6 @@ plugins=(
   yarn
   composer
   docker-compose
-  progressbar
   # Custom
   jump
   random
@@ -96,12 +95,13 @@ zle_highlight+=(paste:none)
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
+export EDITOR='code'
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='code'
-fi
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='code'
+# fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
