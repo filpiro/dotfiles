@@ -1,0 +1,12 @@
+# NPM
+alias n="npm"
+alias ni="npm install"
+alias nrm="npm uninstall"
+alias nid="npm install -D"
+alias nu="npm update"
+alias nr="npm run"
+alias nd="npm run dev"
+alias nw="npm run watch"
+alias nws="npm run watch-bs"
+alias nb="npm run build"
+alias np="npm run production"

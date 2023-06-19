@@ -46,3 +46,5 @@ function zp-fn() {
 }
 
 alias zp="zp-fn"
+
+alias zz="sh zipme.sh"

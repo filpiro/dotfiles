@@ -73,8 +73,8 @@ ZSH_THEME="awesomepanda"
 plugins=(
   sudo
   git
-  npm
-  yarn
+  # npm
+  # yarn
   composer
   # docker-compose
   # Custom
