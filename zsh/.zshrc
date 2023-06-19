@@ -76,7 +76,7 @@ plugins=(
   npm
   yarn
   composer
-  docker-compose
+  # docker-compose
   # Custom
   jump
   random
@@ -95,7 +95,7 @@ zle_highlight+=(paste:none)
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
-export EDITOR='code'
+# export EDITOR='code'
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
@@ -114,8 +114,6 @@ export EDITOR='code'
 # Example aliases
 
 # Mooved in ~/.oh-my-zsh/custom/aliases.zsh
-
-export DOTFILES="$HOME/.dotfiles"
 
 # NVM Config
 export NVM_DIR="$HOME/.nvm"
