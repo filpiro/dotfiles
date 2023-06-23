@@ -3,7 +3,7 @@ alias dcup="docker compose up -d"
 alias dcstop="docker compose stop"
 
 function dev-restart-fn(){
-  docker compose down && \
+  docker compose down
   docker compose up -d --build
 }
 alias dcrestart="dev-restart-fn"
