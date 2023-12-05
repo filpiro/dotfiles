@@ -24,6 +24,8 @@ function dotbot-fn {
 alias dotbot="dotbot-fn"
 
 function dev-fn(){
+  echo "Stopping running containers..."
+  docker stop $(docker ps --format '{{.Names}}')
   code . | docker compose up -d
 }
 alias dev="dev-fn"
