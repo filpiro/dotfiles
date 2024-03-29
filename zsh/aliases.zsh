@@ -4,8 +4,8 @@ export EDITOR='vim'
 
 export DOTFILES="$HOME/.dotfiles"
 
-alias dfconfig="$EDITOR ~/.dotfiles"
-alias ohmyzsh="$EDITOR ~/.oh-my-zsh"
+alias dfconfig="code ~/.dotfiles"
+alias ohmyzsh="code ~/.oh-my-zsh"
 
 alias reload="omz reload"
 alias cl="clear"
@@ -24,8 +24,8 @@ function dotbot-fn {
 alias dotbot="dotbot-fn"
 
 function dev-fn(){
-  echo "Stopping running containers..."
-  docker stop $(docker ps --format '{{.Names}}')
+  local CONTAINERS=$(docker ps --format '{{.Names}}')
+  [ -n "$CONTAINERS" ] && echo "Stopping running containers..." && docker stop $(docker ps --format '{{.Names}}')
   code . | docker compose up -d
 }
 alias dev="dev-fn"
