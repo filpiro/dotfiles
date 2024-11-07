@@ -29,3 +29,8 @@ function dev-fn(){
   code . | docker compose up -d
 }
 alias dev="dev-fn"
+
+function dev-lando-fn(){
+  code . | lando start
+}
+alias devl="dev-lando-fn"
