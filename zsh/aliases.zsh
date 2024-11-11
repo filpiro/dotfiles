@@ -23,14 +23,26 @@ function dotbot-fn {
 }
 alias dotbot="dotbot-fn"
 
-function dev-fn(){
+function docker-all-stop(){
+  
+  if command -v lando 2>&1 >/dev/null 
+    then lando poweroff
+  fi
+
   local CONTAINERS=$(docker ps --format '{{.Names}}')
   [ -n "$CONTAINERS" ] && echo "Stopping running containers..." && docker stop $(docker ps --format '{{.Names}}')
+}
+
+function dev-fn(){
+  docker-all-stop
   code . | docker compose up -d
 }
+
 alias dev="dev-fn"
 
 function dev-lando-fn(){
+  docker-all-stop
   code . | lando start
 }
+
 alias devl="dev-lando-fn"

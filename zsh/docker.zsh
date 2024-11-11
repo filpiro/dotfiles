@@ -3,6 +3,11 @@ alias dcup="docker compose up -d"
 # alias dcstop="docker compose stop"
 
 function dc-stop-fn(){
+  
+  if command -v lando 2>&1 >/dev/null 
+    then lando poweroff
+  fi
+
   docker stop $(docker ps --format '{{.Names}}')
 }
 alias dcstop="dc-stop-fn"
