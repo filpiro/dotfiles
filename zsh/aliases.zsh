@@ -35,14 +35,22 @@ function docker-all-stop(){
 
 function dev-fn(){
   docker-all-stop
+  # check if exist lando.yml file
+  if [ -f ".lando.yml" ]; then
+    code . | lando start
+    return
+  fi
+
   code . | docker compose up -d
 }
 
 alias dev="dev-fn"
 
-function dev-lando-fn(){
-  docker-all-stop
-  code . | lando start
-}
+# function dev-lando-fn(){
+#   docker-all-stop
+#   code . | lando start
+# }
 
-alias devl="dev-lando-fn"
+# alias devl="dev-lando-fn"
+
+alias bat="batcat"
