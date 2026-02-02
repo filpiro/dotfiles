@@ -53,6 +53,5 @@ alias dev="dev-fn"
 
 # alias devl="dev-lando-fn"
 
-alias bat="batcat"
 alias cx="codex"
 alias tm="task-master"
