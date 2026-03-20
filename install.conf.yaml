@@ -5,7 +5,7 @@
       create: true
       glob: true
 
-- clean: ["~"]
+- clean: ["~", "~/.oh-my-zsh/custom"]
 
 - link:
     ~/.bashrc: bash/.bashrc

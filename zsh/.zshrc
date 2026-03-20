@@ -1,3 +1,10 @@
+# OPENSPEC:START
+# OpenSpec shell completions configuration
+fpath=("/home/filippo/.oh-my-zsh/custom/completions" $fpath)
+autoload -Uz compinit
+compinit
+# OPENSPEC:END
+
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -8,7 +15,7 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="minimal"
+ZSH_THEME="awesomepanda"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -72,10 +79,10 @@ ZSH_THEME="minimal"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   sudo
-  git
+  # git
   # npm
   # yarn
-  composer
+  # composer
   # docker-compose
   # Custom
   # jump
@@ -124,3 +131,8 @@ eval "$(zoxide init zsh)"
 
 # Lando
 export PATH="/home/filippo/.lando/bin${PATH+:$PATH}"; #landopath
+
+# opencode
+export PATH=/home/filippo/.opencode/bin:$PATH
+
+[ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"

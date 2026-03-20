@@ -53,5 +53,4 @@ alias dev="dev-fn"
 
 # alias devl="dev-lando-fn"
 
-alias cx="codex"
-alias tm="task-master"
+alias claude-mem='bun "/home/filippo/.claude/plugins/cache/thedotmack/claude-mem/10.5.5/scripts/worker-service.cjs"'
