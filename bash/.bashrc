@@ -119,3 +119,6 @@ fi
 . "$HOME/.local/bin/env"
 
 alias claude-mem='bun "/home/filippo/.claude/plugins/cache/thedotmack/claude-mem/10.5.5/scripts/worker-service.cjs"'
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+. "$HOME/.cargo/env"

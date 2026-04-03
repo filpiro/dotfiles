@@ -5,14 +5,17 @@
       create: true
       glob: true
 
-- clean: ["~", "~/.oh-my-zsh/custom"]
+- clean: ["~", "~/.oh-my-zsh/custom", ~/.local/bin/git-commits-table]
 
 - link:
     ~/.bashrc: bash/.bashrc
     ~/.zshrc: zsh/.zshrc
+    ~/.tmux.conf: tmux/.tmux
+    ~/.local/bin/git-commits-table: bin/git-commits-table.sh
     ~/.oh-my-zsh/custom/:
       path: zsh/**
       exclude: [zsh/.zshrc]
+    
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

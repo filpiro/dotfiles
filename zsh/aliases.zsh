@@ -54,3 +54,68 @@ alias dev="dev-fn"
 # alias devl="dev-lando-fn"
 
 alias claude-mem='bun "/home/filippo/.claude/plugins/cache/thedotmack/claude-mem/10.5.5/scripts/worker-service.cjs"'
+
+pws() {
+  local mode="command"
+  local cmd=""
+  local extra_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -c|--command)
+        mode="command"
+        shift
+        cmd="$*"
+        break
+        ;;
+      -f|--file)
+        mode="file"
+        shift
+        cmd="$1"
+        shift
+        ;;
+      -e|--encoded)
+        mode="encoded"
+        shift
+        cmd="$1"
+        shift
+        ;;
+      -np|--no-profile)
+        extra_args+=("-NoProfile")
+        shift
+        ;;
+      -h|--help)
+        echo "Uso:"
+        echo "  pws -c <comando>        Esegue comando PowerShell"
+        echo "  pws -f <file.ps1>       Esegue script"
+        echo "  pws -e <encoded>        Comando encoded"
+        echo "  pws -np                 NoProfile"
+        return 0
+        ;;
+      *)
+        # fallback: tutto come comando
+        cmd="$*"
+        break
+        ;;
+    esac
+  done
+
+  case "$mode" in
+    command)
+      pwsh.exe "${extra_args[@]}" -Command "$cmd"
+      ;;
+    file)
+      pwsh.exe "${extra_args[@]}" -File "$cmd"
+      ;;
+    encoded)
+      pwsh.exe "${extra_args[@]}" -EncodedCommand "$cmd"
+      ;;
+    *)
+      echo "Modalità non valida"
+      return 1
+      ;;
+  esac
+}
+
+
+alias claude-mem='bun "/home/filippo/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
