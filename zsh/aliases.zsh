@@ -55,7 +55,7 @@ alias dev="dev-fn"
 
 alias claude-mem='bun "/home/filippo/.claude/plugins/cache/thedotmack/claude-mem/10.5.5/scripts/worker-service.cjs"'
 
-pws() {
+function pws-fn() {
   local mode="command"
   local cmd=""
   local extra_args=()
@@ -117,5 +117,6 @@ pws() {
   esac
 }
 
+alias pws="pws-fn"
 
 alias claude-mem='bun "/home/filippo/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
