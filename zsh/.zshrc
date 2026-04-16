@@ -21,6 +21,28 @@ source $ZSH/oh-my-zsh.sh
 # Paste highlight
 zle_highlight+=(paste:none)
 
+# Dimensione history
+HISTSIZE=100000
+SAVEHIST=100000
+HISTFILE=~/.zsh_history
+
+# Scrittura immediata e condivisione tra sessioni (tmux incluso)
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+
+# Qualità dei dati
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+
+# Timestamp (utile per auditing)
+setopt EXTENDED_HISTORY
+
+# Evita comandi banali
+setopt HIST_IGNORE_SPACE
+
 # PATH
 export PATH="/home/filippo/.lando/bin${PATH+:$PATH}"  # landopath
 export PATH=/home/filippo/.opencode/bin:$PATH
@@ -31,7 +53,14 @@ eval "$(zoxide init zsh)"
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 export PATH="$HOME/.local/bin:$PATH"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f ~/.fzf.zsh ]
+then 
+  source ~/.fzf.zsh
+  
+  # Set up fzf key bindings and fuzzy completion
+  source <(fzf --zsh)
+fi
+
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
 
 export CLAUDE_CODE_NO_FLICKER=1

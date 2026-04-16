@@ -5,7 +5,12 @@
       create: true
       glob: true
 
-- clean: ["~", "~/.oh-my-zsh/custom", ~/.local/bin/git-commits-table, ~/.config/tmux/]
+- clean: [
+  "~", 
+  "~/.oh-my-zsh/custom", 
+  "~/.local/bin/", 
+  "~/.config/tmux/",
+  ]
 
 - link:
     ~/.bashrc: bash/.bashrc
@@ -17,7 +22,7 @@
     ~/.config/tmux/: 
       path: tmux/**
       exclude: [tmux/tmux.conf]
-    ~/.local/bin/git-commits-table: bin/git-commits-table.sh
+    ~/.local/bin/: bin/**
     
 
 - shell:
