@@ -2,23 +2,29 @@
 alias dcup="docker compose up -d"
 # alias dcstop="docker compose stop"
 
-function dc-stop-fn(){
-  
-  if command -v lando 2>&1 >/dev/null 
-    then lando poweroff
+function dc-stop-fn() {
+  if command -v lando >/dev/null 2>&1; then
+    lando poweroff
   fi
 
-  docker stop $(docker ps --format '{{.Names}}')
+  docker ps --format '{{.Names}}' | xargs -r docker stop
 }
-alias dcstop="dc-stop-fn"
 
-function dc-restart-fn(){
-  docker compose down
+alias dcstop='dc-stop-fn'
+
+function dc-restart-fn() {
+  docker compose down || return
   docker compose up -d --build
 }
-alias dcrestart="dc-restart-fn"
 
-function dex-fn {
-  docker exec -it -u $UID $(docker ps --format '{{.Names}}' | grep ${1:-php}) bash
+function dex-fn() {
+  local pattern="${1:-php}"
+  local container
+
+  container=$(docker ps --filter "name=$pattern" --format '{{.Names}}' | head -n1)
+
+  [[ -z "$container" ]] && { echo "No container matching: $pattern"; return 1; }
+
+  docker exec -it -u "$UID" "$container" bash
 }
 alias dex="dex-fn"

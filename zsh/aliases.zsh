@@ -7,7 +7,7 @@ export DOTFILES="$HOME/.dotfiles"
 
 alias dfconfig="code ~/.dotfiles"
 alias ohmyzsh="code ~/.oh-my-zsh"
-alias ccc="code ."
+alias vch="code ."
 
 alias reload="omz reload"
 alias cl="clear"

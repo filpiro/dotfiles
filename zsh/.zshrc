@@ -64,3 +64,4 @@ fi
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
 
 export CLAUDE_CODE_NO_FLICKER=1
+export DISABLE_TELEMETRY=1
