@@ -44,3 +44,4 @@ function docker-all-stop(){
 # alias claude-mem='bun "/home/filippo/.claude/plugins/cache/thedotmack/claude-mem/10.5.5/scripts/worker-service.cjs"'
 # alias claude-mem='bun "/home/filippo/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
+alias lg="lazygit"
