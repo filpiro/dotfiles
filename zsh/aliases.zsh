@@ -1,7 +1,7 @@
 # alias zshconfig="$EDITOR ~/.zshrc"
 # alias zshconfig="$EDITOR $DOTFILES/zsh/"
-# export EDITOR='nvim'
-export EDITOR='code'
+export EDITOR='nvim'
+# export EDITOR='code'
 
 export DOTFILES="$HOME/.dotfiles"
 

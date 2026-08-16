@@ -68,3 +68,14 @@ export DISABLE_TELEMETRY=1
 
 # Shrink bash output limit
 export BASH_MAX_OUTPUT_LENGTH=1500
+
+
+# yazi
+unalias ya 2>/dev/null
+function y() {
+      local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+      yazi "$@" --cwd-file="$tmp"
+      IFS= read -r -d '' cwd < "$tmp"
+      [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+      rm -f -- "$tmp"
+}
