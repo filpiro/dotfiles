@@ -63,9 +63,6 @@ fi
 
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
 
-# Disable telemetry skills.sh
-export DISABLE_TELEMETRY=1
-
 # Shrink bash output limit
 export BASH_MAX_OUTPUT_LENGTH=1500
 

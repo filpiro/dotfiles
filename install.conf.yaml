@@ -10,6 +10,7 @@
   "~/.oh-my-zsh/custom", 
   "~/.local/bin/", 
   "~/.config/tmux/",
+  "~/.config/yazi/",
   ]
 
 - link:
@@ -22,6 +23,7 @@
     ~/.config/tmux/: 
       path: tmux/**
       exclude: [tmux/tmux.conf]
+    ~/.config/yazi/: yazi/**
     ~/.local/bin/: bin/**
     
 
