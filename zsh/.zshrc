@@ -47,11 +47,11 @@ setopt HIST_IGNORE_SPACE
 export PATH="/home/filippo/.lando/bin${PATH+:$PATH}"  # landopath
 export PATH=/home/filippo/.opencode/bin:$PATH
 
-# Tools
-eval "$(zoxide init zsh)"
-
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 export PATH="$HOME/.local/bin:$PATH"
+
+# Tools
+eval "$(zoxide init zsh)"
 
 if [ -f ~/.fzf.zsh ]
 then 
