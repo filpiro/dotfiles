@@ -22,7 +22,7 @@ function tn-fn() {
     esac
   done
 
-  repo_name=$(git rev-parse --show-toplevel 2>/dev/null | xargs basename)
+  repo_name=${$(git rev-parse --show-toplevel 2>/dev/null):t}
   # tmux rimpiazza "." e ":" con "_" nei nomi sessione: normalizza prima
   repo_name=${repo_name//[.:]/_}
 

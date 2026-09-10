@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+# prompt — creates a WWHW feature folder and prompt template
+# Usage: prompt <feature-name>
+
+set -euo pipefail
+
+if [[ -z "${1:-}" ]]; then
+  echo "Usage: prompt <feature-name>"
+  exit 1
+fi
+
+slugify() {
+  echo "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | tr ' ' '-' \
+    | tr -cd '[:alnum:]-'
+}
+
+FEATURE="$(slugify "$1")"
+DATE="$(date +%Y%m%d)"
+TS="$(date '+%Y-%m-%d %H:%M')"
+BASE_DIR="./.agents/specs/${FEATURE}"
+
+if [[ -d "$BASE_DIR" ]]; then
+  VERSION=2
+  while [[ -d "${BASE_DIR}-v${VERSION}" ]]; do
+    VERSION=$((VERSION + 1))
+  done
+  BASE_DIR="${BASE_DIR}-v${VERSION}"
+  FEATURE="${FEATURE}-v${VERSION}"
+fi
+
+mkdir -p "$BASE_DIR"
+
+PROMPT_PATH="${BASE_DIR}/prompt.md"
+SPEC_PATH="${BASE_DIR}/spec.md"
+PROGRESS_PATH="${BASE_DIR}/progress.md"
+
+cat > "$PROMPT_PATH" <<'TEMPLATE'
+# FEATURE_NAME
+Date: DATE_VALUE
+Status: Draft
+
+## Why
+# Concrete problem.
+# What is broken or missing today?
+# Why does it matter?
+# What user or business impact exists now?
+
+## What
+# Expected behavior only.
+# Happy path, relevant failure path, visible outcome.
+# No implementation instructions.
+# Put only explicit non-negotiable constraints here.
+
+## How
+# Existing resources the agent may use.
+# APIs, components, routes, modules, patterns, constraints.
+# Describe what exists and where.
+# Do not prescribe exact implementation unless already decided.
+
+## Where
+# Entry points and relevant files.
+# Keep this focused, not exhaustive.
+TEMPLATE
+
+cat > "$SPEC_PATH" <<'TEMPLATE'
+# FEATURE_NAME
+Date: DATE_VALUE
+Status: Pending plate-it
+Source: prompt / grill-me
+
+<!-- Filled by plate-it -->
+TEMPLATE
+
+cat > "$PROGRESS_PATH" <<'TEMPLATE'
+# Progress
+Feature: FEATURE_NAME
+Started: DATE_TIME_VALUE
+Status: pending
+
+## Steps
+
+## Log
+TEMPLATE
+
+
+sed -i "s/FEATURE_NAME/${FEATURE}/g" "$PROMPT_PATH" "$SPEC_PATH" "$PROGRESS_PATH"
+sed -i "s/DATE_VALUE/${DATE}/g" "$PROMPT_PATH" "$SPEC_PATH"
+sed -i "s/DATE_TIME_VALUE/${TS}/g" "$PROGRESS_PATH"
+
+echo "Created feature workspace: $BASE_DIR"
+echo "- $PROMPT_PATH"
+echo "- $SPEC_PATH"
+echo "- $PROGRESS_PATH"
+
+${EDITOR:-vi} "$PROMPT_PATH"

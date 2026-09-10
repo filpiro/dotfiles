@@ -1,0 +1,309 @@
+#!/bin/bash
+
+# git-commits-tables.sh
+# Mostra tutti i commit di tutti i branch in formato CSV
+# e salva l'output in un file .csv.
+#
+# Usage:
+#   ./git-commits-tables.sh [--date "<expr>"] [--author "<n>"] [--output <dir>]
+#
+# Se --author non viene specificato, rileva automaticamente tutti i nomi
+# associati all'utente corrente (git config user.name + user.email)
+# Se --output non viene specificato, salva nella cartella ./reports
+
+export GIT_PAGER=cat
+
+AUTHOR=""
+AUTHOR_LABEL=""
+AUTHOR_MATCH_LIST=""
+DATE_EXPR=""
+OUTPUT_DIR=""
+
+YEAR=$(date +%Y)
+MONTH=$(date +%m)
+
+
+# ---------------------------------------------------------------------------
+# last_day_of_month <year> <month>
+# ---------------------------------------------------------------------------
+last_day_of_month() {
+  local year="$1"
+  local month="$2"
+
+  date -d "${year}-${month}-01 +1 month -1 day" +%d 2>/dev/null
+}
+
+# ---------------------------------------------------------------------------
+# parse_date <input> <is_end>
+# ---------------------------------------------------------------------------
+parse_date() {
+  local input="$1"
+  local is_end="$2"
+  local result=""
+  local tz_offset=""
+  local month_num=""
+  local last_day=""
+
+  if [[ "$input" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+    result="$input"
+  elif [[ "$input" =~ ^[0-9]{2}-[0-9]{2}$ ]]; then
+    result="$YEAR-$input"
+  elif [[ "$input" =~ ^[0-9]{1,2}$ ]]; then
+    month_num=$((10#$input))
+    if (( month_num >= 1 && month_num <= 12 )); then
+      if [[ "$is_end" == "1" ]]; then
+        last_day=$(last_day_of_month "$YEAR" "$(printf "%02d" "$month_num")")
+        result=$(printf "%s-%02d-%s" "$YEAR" "$month_num" "$last_day")
+      else
+        result=$(printf "%s-%02d-01" "$YEAR" "$month_num")
+      fi
+    else
+      result=$(printf "%s-%s-%02d" "$YEAR" "$MONTH" "$month_num")
+    fi
+  else
+    echo "ERROR: formato data non riconosciuto: '$input'" >&2
+    exit 1
+  fi
+
+  tz_offset=$(date -d "$result" +%z 2>/dev/null)
+  if [[ -z "$tz_offset" ]]; then
+    echo "ERROR: impossibile determinare il fuso orario per '$result'" >&2
+    exit 1
+  fi
+
+  if [[ "$is_end" == "1" ]]; then
+    echo "$result 23:59:59 $tz_offset"
+  else
+    echo "$result 00:00:00 $tz_offset"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Argomenti
+# ---------------------------------------------------------------------------
+while [[ "$#" -gt 0 ]]; do
+  case $1 in
+    --author|-a) AUTHOR="$2"; shift ;;
+    --date|-d)   DATE_EXPR="$2"; shift ;;
+    --output|-o) OUTPUT_DIR="$2"; shift ;;
+    --help|-h)
+      echo ""
+      echo "Usage:"
+      echo "  git-commits-tables.sh [OPTIONS]"
+      echo ""
+      echo "Options:"
+      echo "  -d, --date   <expr>   Filtra per data"
+      echo "  -a, --author <name>   Filtra per autore"
+      echo "                        Se non specificato, usa automaticamente:"
+      echo "                        git config user.name + git config user.email"
+      echo "  -o, --output <dir>    Directory di destinazione del file CSV"
+      echo "                        (default: ./reports)"
+      echo "  -h, --help            Mostra questo messaggio"
+      echo ""
+      echo "Date expressions:"
+      echo "  03                     Tutto marzo, anno corrente"
+      echo "  15                     Giorno 15, mese/anno correnti"
+      echo "  03-15                  15 marzo, anno corrente"
+      echo "  2025-03-15             Data esatta"
+      echo "  03:04                  Da marzo ad aprile, anno corrente"
+      echo "  1:15                   Dal giorno 1 al 15, mese/anno correnti"
+      echo "  03-01:03-31            Dal 1 al 31 marzo, anno corrente"
+      echo "  2025-03-01:2025-03-31  Range esplicito completo"
+      echo ""
+      echo "Output:"
+      echo "  Salva un file CSV con nome:"
+      echo "    <project>_<date-range>.csv"
+      echo ""
+      echo "  Se non viene specificato --output, il file viene salvato in:"
+      echo "    ./reports"
+      echo ""
+      echo "Examples:"
+      echo "  ./git-commits-tables.sh"
+      echo "  ./git-commits-tables.sh -d 03"
+      echo "  ./git-commits-tables.sh -d 03-17"
+      echo "  ./git-commits-tables.sh -d 1:15"
+      echo "  ./git-commits-tables.sh -d 03-01:03-31 -a \"Filippo\""
+      echo "  ./git-commits-tables.sh -d 2025-03-01:2025-03-31 -o ~/reports"
+      echo ""
+      echo "Generated paths:"
+      echo "  ./git-commits-tables.sh"
+      echo "    -> ./reports/<project>_tutti.csv"
+      echo ""
+      echo "  ./git-commits-tables.sh -d 03"
+      echo "    -> ./reports/<project>_<anno>-03-01_<anno>-03-31.csv"
+      echo ""
+      echo "  ./git-commits-tables.sh -o ~/reports"
+      echo "    -> ~/reports/<project>_tutti.csv"
+      echo ""
+      exit 0
+      ;;
+    *) echo "Parametro sconosciuto: $1. Usa --help per la guida."; exit 1 ;;
+  esac
+  shift
+done
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Author: rileva automaticamente git config user.name e user.email
+# e applica un match esatto su nome e/o email
+# ---------------------------------------------------------------------------
+if [[ -z "$AUTHOR" ]]; then
+  GIT_NAME=$(git config user.name 2>/dev/null)
+  GIT_EMAIL=$(git config user.email 2>/dev/null)
+  AUTHOR_MATCHES=()
+  [[ -n "$GIT_NAME" ]] && AUTHOR_MATCHES+=("$GIT_NAME")
+  [[ -n "$GIT_EMAIL" ]] && AUTHOR_MATCHES+=("$GIT_EMAIL")
+
+  if [[ "${#AUTHOR_MATCHES[@]}" -gt 0 ]]; then
+    AUTHOR_MATCH_LIST=$(printf '%s\n' "${AUTHOR_MATCHES[@]}")
+    AUTHOR_LABEL="$GIT_NAME"
+    [[ -n "$GIT_EMAIL" ]] && AUTHOR_LABEL="${AUTHOR_LABEL:+$AUTHOR_LABEL, }$GIT_EMAIL"
+    echo "→ Author  : $AUTHOR_LABEL (da git config)"
+  else
+    echo "→ Author  : nessun filtro (git config user.name non trovato)"
+  fi
+else
+  AUTHOR_LABEL="$AUTHOR"
+  echo "→ Author  : $AUTHOR"
+fi
+
+# ---------------------------------------------------------------------------
+# Parsing date expression
+# ---------------------------------------------------------------------------
+SINCE=""
+UNTIL=""
+DATE_LABEL="tutti"
+
+if [[ -n "$DATE_EXPR" ]]; then
+  if [[ "$DATE_EXPR" == *":"* ]]; then
+    START_RAW="${DATE_EXPR%%:*}"
+    END_RAW="${DATE_EXPR##*:}"
+    SINCE=$(parse_date "$START_RAW" "0") || exit 1
+    UNTIL=$(parse_date "$END_RAW"   "1") || exit 1
+  else
+    SINCE=$(parse_date "$DATE_EXPR" "0") || exit 1
+    UNTIL=$(parse_date "$DATE_EXPR" "1") || exit 1
+  fi
+  SINCE_LABEL="${SINCE%% *}"
+  UNTIL_LABEL="${UNTIL%% *}"
+  if [[ "$SINCE_LABEL" == "$UNTIL_LABEL" ]]; then
+    DATE_LABEL="$SINCE_LABEL"
+  else
+    DATE_LABEL="${SINCE_LABEL}_${UNTIL_LABEL}"
+  fi
+  echo "→ Date    : ${SINCE} → ${UNTIL}"
+else
+  echo "→ Date    : nessun filtro"
+fi
+
+# ---------------------------------------------------------------------------
+# Project name: nome della cartella corrente
+# ---------------------------------------------------------------------------
+PROJECT=$(basename "$PWD")
+echo "→ Project : $PROJECT"
+
+# ---------------------------------------------------------------------------
+# Output dir
+# Default: ./reports
+# ---------------------------------------------------------------------------
+if [[ -z "$OUTPUT_DIR" ]]; then
+  OUTPUT_DIR="reports"
+fi
+
+mkdir -p "$OUTPUT_DIR"
+
+echo "→ Output  : $OUTPUT_DIR"
+
+echo ""
+
+# ---------------------------------------------------------------------------
+# Fetch remoti (silenzioso)
+# ---------------------------------------------------------------------------
+git fetch --all -q 2>/dev/null
+
+# ---------------------------------------------------------------------------
+# Build git log args
+# Usa --all per coprire tutti i branch; GIT_PAGER=cat evita il loop con less
+# ---------------------------------------------------------------------------
+GIT_ARGS=(
+  --all
+  --no-merges
+  "--format=%H|%as|%aI|%an|%ae|%s"
+)
+
+[[ -n "$AUTHOR" ]] && GIT_ARGS+=("--author=$AUTHOR")
+[[ -n "$SINCE"  ]] && GIT_ARGS+=("--since=$SINCE")
+[[ -n "$UNTIL"  ]] && GIT_ARGS+=("--until=$UNTIL")
+
+# ---------------------------------------------------------------------------
+# Loader
+# ---------------------------------------------------------------------------
+spinner() {
+  local pid=$1
+  local frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+  while kill -0 "$pid" 2>/dev/null; do
+    for (( i=0; i<${#frames}; i++ )); do
+      printf "\r  %s  Recupero commit..." "${frames:$i:1}"
+      sleep 0.08
+    done
+  done
+  printf "\r\033[K"
+}
+
+# ---------------------------------------------------------------------------
+# Raccogli i dati (deduplicati per hash, ordinati per data desc)
+# ---------------------------------------------------------------------------
+ROWS_FILE=$(mktemp)
+(
+  git log "${GIT_ARGS[@]}" \
+    | awk -F'|' -v author_list="$AUTHOR_MATCH_LIST" '
+        BEGIN {
+          if (author_list == "") {
+            use_filter = 0
+          } else {
+            use_filter = 1
+            split(author_list, allowed_lines, "\n")
+            for (i in allowed_lines) {
+              if (allowed_lines[i] != "") {
+                allowed[allowed_lines[i]] = 1
+              }
+            }
+          }
+        }
+        !use_filter || allowed[$4] || allowed[$5]
+      ' \
+    | sort -u -t'|' -k1,1 \
+    | sort -t'|' -k2,2r -k3,3r
+) > "$ROWS_FILE" &
+ROWS_PID=$!
+spinner "$ROWS_PID"
+wait "$ROWS_PID"
+ROWS=$(cat "$ROWS_FILE")
+rm -f "$ROWS_FILE"
+
+# ---------------------------------------------------------------------------
+# Output CSV
+# ---------------------------------------------------------------------------
+CSV_FILENAME="${PROJECT}_${DATE_LABEL}.csv"
+CSV_FILE="${OUTPUT_DIR}/${CSV_FILENAME}"
+
+{
+  echo "date,hour,author,commit message"
+  echo "$ROWS" | awk -F'|' '
+    function csv_escape(value) {
+      gsub(/"/, "\"\"", value)
+      return "\"" value "\""
+    }
+
+    NF >= 6 {
+      hour = substr($3, 12, 8)
+      if (hour == "") {
+        hour = "00:00:00"
+      }
+
+      print csv_escape($2) "," csv_escape(hour) "," csv_escape($4) "," csv_escape($6)
+    }
+  '
+} > "$CSV_FILE"
+
+echo "✓ Salvato: $CSV_FILE"
