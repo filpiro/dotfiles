@@ -6,9 +6,9 @@
       glob: true
 
 - clean: [
-  "~", 
-  "~/.oh-my-zsh/custom", 
-  "~/.local/bin/", 
+  "~",
+  "~/.config/zsh/",
+  "~/.local/bin/",
   "~/.config/tmux/",
   "~/.config/yazi/",
   ]
@@ -16,16 +16,18 @@
 - link:
     ~/.bashrc: bash/.bashrc
     ~/.zshrc: zsh/.zshrc
-    ~/.oh-my-zsh/custom/:
-      path: zsh/**
-      exclude: [zsh/.zshrc]
+    ~/.config/zsh/:
+      path: zsh/*.zsh
+    ~/.config/zsh/plugins:
+      path: zsh/plugins
+      glob: false
     ~/.tmux.conf: tmux/tmux.conf
-    ~/.config/tmux/: 
+    ~/.config/tmux/:
       path: tmux/**
       exclude: [tmux/tmux.conf]
     ~/.config/yazi/: yazi/**
     ~/.local/bin/: bin/**
-    
+
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

@@ -6,10 +6,10 @@ export EDITOR='nvim'
 export DOTFILES="$HOME/.dotfiles"
 
 alias dfconfig="code ~/.dotfiles"
-alias ohmyzsh="code ~/.oh-my-zsh"
+alias zshconfig="code ~/.config/zsh"
 alias vch="code ."
 
-alias reload="omz reload"
+alias reload="exec zsh"
 alias cl="clear"
 
 # WSL utility
@@ -26,7 +26,7 @@ alias pws="pwsh.exe"
 function dotbot-fn {
   $HOME/.dotfiles/install
   echo "Reloading..."
-  omz reload
+  exec zsh
 }
 alias dotbot="dotbot-fn"
 
