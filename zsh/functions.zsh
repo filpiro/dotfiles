@@ -11,3 +11,8 @@ function y() {
   [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
   rm -f -- "$tmp"
 }
+
+if [[ "$START_YAZI" == "1" && -o interactive ]]; then
+  unset START_YAZI
+  y
+fi

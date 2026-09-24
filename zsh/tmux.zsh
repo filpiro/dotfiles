@@ -10,14 +10,14 @@ alias tk="tmux kill-session"
 #     • dentro tmux → switch alla sessione se esiste, altrimenti la crea
 # Questo evita l’errore "duplicate session" quando sei già dentro tmux.
 #
-# Con -w/--width <comando>: split verticale 70|30, comando nel pane 70%,
-# apre anche "code ." in parallelo (senza aspettare tmux).
+# Sempre split verticale 60|40. Pane sinistro: yazi (y).
+# Con -c/--command <comando>: comando a sinistra, yazi a destra.
 function tn-fn() {
-  local repo_name cmd pane
+  local repo_name cmd pane right
 
   while [[ "$1" == -* ]]; do
     case "$1" in
-      -w|--width) cmd="$2"; shift 2 ;;
+      -c|--command) cmd="$2"; shift 2 ;;
       *) shift ;;
     esac
   done
@@ -31,27 +31,24 @@ function tn-fn() {
     return
   fi
 
-  if [[ -n "$cmd" ]]; then
-    code . >/dev/null 2>&1 &!
-  fi
-
   # ponytail: layout applicato solo alla creazione, non ad ogni attach
   # "=" e pane_id evitano che i punti nel nome repo (foo.it) siano letti da
   # tmux come target window.pane
   if ! tmux has-session -t "=$repo_name" 2>/dev/null; then
     pane=$(tmux new-session -d -P -F '#{pane_id}' -s "$repo_name")
+    # split 60|40: il pane originale resta a sinistra
+    # con comando: comando a sinistra, yazi a destra; senza: yazi a sinistra
+    right=$(tmux split-window -h -l 40% -P -F '#{pane_id}' -t "$pane")
     if [[ -n "$cmd" ]]; then
-      tmux split-window -h -l 30% -t "$pane"
-      # il comando va sempre nel pane piu' largo (70%), qualunque sia il lato
-      pane=$(tmux list-panes -t "$pane" -F '#{pane_width} #{pane_id}' | sort -nr | head -1 | cut -d' ' -f2)
-      tmux send-keys -t "$pane" "$cmd" C-m
-      tmux select-pane -t "$pane"
+      tmux send-keys -t "$right" y C-m
     fi
+    tmux send-keys -t "$pane" "${cmd:-y}" C-m
+    tmux select-pane -t "$pane"
   fi
 
   [[ -n "$TMUX" ]] && tmux switch-client -t "=$repo_name" || tmux attach -t "=$repo_name"
 }
 
 alias tn='tn-fn'
-alias tnc='tn-fn -w claude'
-alias tnx='tn-fn -w codex'
+alias tnc='tn-fn -c claude'
+alias tnx='tn-fn -c codex'
