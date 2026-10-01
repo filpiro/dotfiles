@@ -22,20 +22,35 @@ ensure() {
 }
 
 render() {
-  local panes width zoomed me out s
+  local panes width zoomed me active sel= key rest names i s
   tput civis
-  # ponytail: polls every 1s; switch to hooks if the cost ever shows up
-  while IFS=$'\t' read -r panes width zoomed me < <(tmux display -p -t "$TMUX_PANE" \
-    $'#{window_panes}\t#{pane_width}\t#{window_zoomed_flag}\t#{session_name}'); do
+  # Keys (when the Sidebar pane has focus, e.g. M-Left): j/k or Down/Up move, Enter switches Session.
+  while IFS=$'\t' read -r panes width zoomed me active < <(tmux display -p -t "$TMUX_PANE" \
+    $'#{window_panes}\t#{pane_width}\t#{window_zoomed_flag}\t#{session_name}\t#{pane_active}'); do
     # last non-Sidebar pane gone: exit so the window closes too
     (( panes > 1 )) || exit 0
     # resize-pane would unzoom the window, so skip while zoomed
     (( width == WIDTH || zoomed )) || tmux resize-pane -t "$TMUX_PANE" -x $WIDTH
-    out=$(tmux list-sessions -F '#{session_name}' | sort -f | while IFS= read -r s; do
-      if [[ $s == "$me" ]]; then printf '\e[1;35m%.*s\e[0m\n' $((WIDTH - 1)) "$s"; else printf '%.*s\n' $((WIDTH - 1)) "$s"; fi
-    done)
-    printf '\e[H\e[J%s' "$out"
-    sleep 1
+    mapfile -t names < <(tmux list-sessions -F '#{session_name}' | sort -f)
+    # without focus, or when the selected Session is gone, selection follows the current Session
+    [[ $active == 1 && " ${names[*]} " == *" $sel "* && -n $sel ]] || sel=$me
+    printf '\e[H\e[J'
+    for i in "${!names[@]}"; do
+      s=${names[i]}
+      if [[ $s == "$sel" && $active == 1 ]]; then printf '\e[7m'; elif [[ $s == "$me" ]]; then printf '\e[1;35m'; fi
+      printf '%.*s\e[0m\n' $((WIDTH - 1)) "$s"
+    done
+    # ponytail: Session names with spaces break the " name " membership test above
+    IFS= read -rsn1 -t 1 key || continue
+    [[ $key == $'\e' ]] && { IFS= read -rsn2 -t 0.05 rest; key+=$rest; }
+    for i in "${!names[@]}"; do [[ ${names[i]} == "$sel" ]] && break; done
+    case $key in
+      j|$'\e[B') sel=${names[i + 1 < ${#names[@]} ? i + 1 : i]} ;;
+      k|$'\e[A') sel=${names[i > 0 ? i - 1 : 0]} ;;
+      '') # Enter: hand focus back to the work pane so it is there on return
+        tmux select-pane -t "$TMUX_PANE" -R
+        tmux switch-client -t "=$sel" ;;
+    esac
   done
 }
 
