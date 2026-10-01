@@ -49,6 +49,16 @@ check "killed Session disappears within ~1s" 'wait_for "! t capture-pane -p -t $
 t kill-pane -t "$(sidebar_pane Alpha:1)"
 check "killed Sidebar comes back" 'wait_for "[[ \$(sidebars Alpha:1) == 1 ]]"'
 
+all_sidebars() { t list-panes -a -F '#{pane_start_command}' | grep -c 'sidebar.sh.* render'; }
+./sidebar.sh toggle
+check "toggle hides every Sidebar" 'wait_for "[[ \$(all_sidebars) == 0 ]]"'
+t new-window -d -t Alpha
+sleep 1
+check "new window stays without Sidebar while hidden" '[[ $(all_sidebars) == 0 ]]'
+./sidebar.sh toggle
+check "toggle shows a Sidebar in every window" 'wait_for "[[ \$(all_sidebars) == \$(t list-windows -a | wc -l) ]]"'
+pane=$(sidebar_pane beta:0) # toggle made a new one
+
 t kill-pane -t "$(sidebar_pane beta:1 !)"
 check "window closes when only Sidebar left" 'wait_for "[[ \$(t list-windows -t beta | wc -l) == 1 ]]"'
 

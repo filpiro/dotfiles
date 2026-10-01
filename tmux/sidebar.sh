@@ -5,6 +5,7 @@
 #
 # Usage: sidebar.sh init            hook new windows + add Sidebar to all windows
 #        sidebar.sh ensure [window] add Sidebar where missing (default: all windows)
+#        sidebar.sh toggle          hide the Sidebar in all windows, or show it again
 #        sidebar.sh render          loop run inside the Sidebar pane
 set -u
 SELF=$(realpath "$0")
@@ -12,6 +13,8 @@ WIDTH=25
 
 ensure() {
   local win panes
+  # hidden: the hooks must not bring the Sidebar back
+  [[ -z $(tmux show -gqv @sidebar-hidden) ]] || return 0
   for win in ${1:-$(tmux list-windows -a -F '#{window_id}')}; do
     # window already gone (hook fired for its last pane)
     panes=$(tmux list-panes -t "$win" -F '#{pane_start_command}' 2>/dev/null) || continue
@@ -54,6 +57,20 @@ render() {
         tmux switch-client -t "=$sel" ;;
     esac
   done
+}
+
+toggle() {
+  local pane
+  if [[ -n $(tmux show -gqv @sidebar-hidden) ]]; then
+    tmux set -gu @sidebar-hidden
+    ensure
+  else
+    # set first: killing the panes fires the hooks that call ensure
+    tmux set -g @sidebar-hidden 1
+    for pane in $(tmux list-panes -a -F '#{pane_id} #{pane_start_command}' | awk '/sidebar.sh.* render/{print $1}'); do
+      tmux kill-pane -t "$pane"
+    done
+  fi
 }
 
 init() {
