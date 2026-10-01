@@ -56,6 +56,23 @@ t select-window -t Alpha:1
 check "visiting the window clears the dot" \
   'wait_for "! t capture-pane -p -e -t $pane | grep -q \"31m●\""'
 
+# Busy: what the Claude Code hooks do (set/unset @busy on their own pane)
+work=$(sidebar_pane Alpha:1 ! | head -1)
+t set -p -t "$work" @busy 1
+check "busy pane shows a yellow dot next to its Session" \
+  'wait_for "t capture-pane -p -e -t $pane | grep \"33m●\" | grep -q Alpha"'
+printf '\a' > "$(t display -p -t "$work" '#{pane_tty}')"
+t select-window -t Alpha:0 # bell only counts in a window nobody looks at
+t select-window -t Alpha:1
+t select-window -t Alpha:0
+printf '\a' > "$(t display -p -t "$work" '#{pane_tty}')"
+check "red dot wins over yellow" \
+  'wait_for "t capture-pane -p -e -t $pane | grep -q \"31m●\" && ! t capture-pane -p -e -t $pane | grep -q \"33m●\""'
+t set -p -u -t "$work" @busy
+t select-window -t Alpha:1
+check "clearing busy removes the yellow dot" \
+  'wait_for "! t capture-pane -p -e -t $pane | grep -q \"●\""'
+
 t kill-pane -t "$(sidebar_pane Alpha:1)"
 check "killed Sidebar comes back" 'wait_for "[[ \$(sidebars Alpha:1) == 1 ]]"'
 

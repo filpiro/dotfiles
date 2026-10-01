@@ -26,7 +26,7 @@ ensure() {
 
 render() {
   local panes width zoomed me active sel= key rest names i s n a
-  local -A alert
+  local -A alert busy
   tput civis
   # keys typed between reads would otherwise be echoed (^[[A)
   stty -echo
@@ -43,6 +43,9 @@ render() {
       names+=("$n")
       [[ $a == *'!'* ]] && alert[$n]=1
     done < <(tmux list-sessions -F $'#{session_name}\t#{session_alerts}' | sort -f)
+    # Busy: a program set the pane option @busy (tmux set -p @busy 1); Alert wins
+    busy=()
+    while IFS= read -r n; do busy[$n]=1; done < <(tmux list-panes -a -f '#{@busy}' -F '#{session_name}')
     # without focus, or when the selected Session is gone, selection follows the current Session
     [[ $active == 1 && " ${names[*]} " == *" $sel "* && -n $sel ]] || sel=$me
     printf '\e[H\e[J'
@@ -52,6 +55,8 @@ render() {
       if [[ -n ${alert[$s]:-} ]]; then
         # 2 columns for " ●"
         printf '%.*s\e[0m \e[31m●\e[0m\n' $((WIDTH - 3)) "$s"
+      elif [[ -n ${busy[$s]:-} ]]; then
+        printf '%.*s\e[0m \e[33m●\e[0m\n' $((WIDTH - 3)) "$s"
       else
         printf '%.*s\e[0m\n' $((WIDTH - 1)) "$s"
       fi
