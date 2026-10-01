@@ -62,8 +62,8 @@ check "visiting the window clears the dot" \
 busy_on='[ -z "$TMUX_PANE" ] || tmux set -p -t "$TMUX_PANE" @busy 1'
 busy_off='[ -z "$TMUX_PANE" ] || tmux set -pu -t "$TMUX_PANE" @busy'
 TMUX_PANE=$work sh -c "$busy_on"
-check "busy pane shows a yellow dot next to its Session" \
-  'wait_for "t capture-pane -p -e -t $pane | grep \"33m●\" | grep -q Alpha"'
+check "busy pane shows a blinking yellow dot next to its Session" \
+  'wait_for "t capture-pane -p -e -t $pane | grep \"5m.\\\\[33m●\" | grep -q Alpha"'
 t select-window -t Alpha:0 # bell only counts in a window nobody looks at
 ring "$work"
 check "red dot wins over yellow" \

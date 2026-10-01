@@ -52,9 +52,9 @@ render() {
     for i in "${!names[@]}"; do
       s=${names[i]}
       if [[ $s == "$sel" && $active == 1 ]]; then printf '\e[7m'; elif [[ $s == "$me" ]]; then printf '\e[1;35m'; fi
-      # dot colour: red Alert wins over yellow Busy
+      # dot colour: red Alert wins over yellow (blinking) Busy
       dot=${alert[$s]:+31}
-      dot=${dot:-${busy[$s]:+33}}
+      dot=${dot:-${busy[$s]:+5;33}} # 5 = blink, WezTerm fades it (text_blink_rate)
       if [[ -n $dot ]]; then
         # 2 columns for " ●"
         printf '%.*s\e[0m \e[%sm●\e[0m\n' $((WIDTH - 3)) "$s" "$dot"
