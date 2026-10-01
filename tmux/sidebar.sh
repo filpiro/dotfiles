@@ -25,7 +25,7 @@ ensure() {
 }
 
 render() {
-  local panes width zoomed me active sel= key rest names i s n a
+  local panes width zoomed me active sel= key rest names i s n a dot
   local -A alert busy
   tput civis
   # keys typed between reads would otherwise be echoed (^[[A)
@@ -52,11 +52,12 @@ render() {
     for i in "${!names[@]}"; do
       s=${names[i]}
       if [[ $s == "$sel" && $active == 1 ]]; then printf '\e[7m'; elif [[ $s == "$me" ]]; then printf '\e[1;35m'; fi
-      if [[ -n ${alert[$s]:-} ]]; then
+      # dot colour: red Alert wins over yellow Busy
+      dot=${alert[$s]:+31}
+      dot=${dot:-${busy[$s]:+33}}
+      if [[ -n $dot ]]; then
         # 2 columns for " ●"
-        printf '%.*s\e[0m \e[31m●\e[0m\n' $((WIDTH - 3)) "$s"
-      elif [[ -n ${busy[$s]:-} ]]; then
-        printf '%.*s\e[0m \e[33m●\e[0m\n' $((WIDTH - 3)) "$s"
+        printf '%.*s\e[0m \e[%sm●\e[0m\n' $((WIDTH - 3)) "$s" "$dot"
       else
         printf '%.*s\e[0m\n' $((WIDTH - 1)) "$s"
       fi
