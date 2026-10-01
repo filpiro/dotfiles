@@ -1,0 +1,6 @@
+Status:children_remove(1, Status.LEFT)
+Status:children_remove(2, Status.LEFT)
+-- Status:children_remove(3, Status.LEFT)
+Status:children_remove(4, Status.RIGHT)
+Status:children_remove(5, Status.RIGHT)
+Status:children_remove(6, Status.RIGHT)
