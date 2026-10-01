@@ -24,6 +24,8 @@ ensure() {
 render() {
   local panes width zoomed me active sel= key rest names i s
   tput civis
+  # keys typed between reads would otherwise be echoed (^[[A)
+  stty -echo
   # Keys (when the Sidebar pane has focus, e.g. M-Left): j/k or Down/Up move, Enter switches Session.
   while IFS=$'\t' read -r panes width zoomed me active < <(tmux display -p -t "$TMUX_PANE" \
     $'#{window_panes}\t#{pane_width}\t#{window_zoomed_flag}\t#{session_name}\t#{pane_active}'); do
@@ -45,8 +47,8 @@ render() {
     [[ $key == $'\e' ]] && { IFS= read -rsn2 -t 0.05 rest; key+=$rest; }
     for i in "${!names[@]}"; do [[ ${names[i]} == "$sel" ]] && break; done
     case $key in
-      j|$'\e[B') sel=${names[i + 1 < ${#names[@]} ? i + 1 : i]} ;;
-      k|$'\e[A') sel=${names[i > 0 ? i - 1 : 0]} ;;
+      j|$'\e[B'|$'\eOB') sel=${names[i + 1 < ${#names[@]} ? i + 1 : i]} ;;
+      k|$'\e[A'|$'\eOA') sel=${names[i > 0 ? i - 1 : 0]} ;;
       '') # Enter: hand focus back to the work pane so it is there on return
         tmux select-pane -t "$TMUX_PANE" -R
         tmux switch-client -t "=$sel" ;;
