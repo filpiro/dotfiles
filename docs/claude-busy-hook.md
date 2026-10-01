@@ -33,5 +33,5 @@ Check: in a pane of another Session run `tmux set -p @busy 1`. A yellow dot
 appears next to that Session. Run `tmux set -pu @busy` and it goes away.
 
 The yellow dot blinks (SGR 5). WezTerm turns the blink into a slow fade with
-`text_blink_rate = 1000` and `text_blink_ease_in`/`_out = 'EaseInOut'` in
+`text_blink_rate = 1000` and `text_blink_ease_in`/`_out = 'Linear'` in
 `wezterm.lua` (on the Windows side, not in this repo).
