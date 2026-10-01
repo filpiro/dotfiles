@@ -25,7 +25,8 @@ ensure() {
 }
 
 render() {
-  local panes width zoomed me active sel= key rest names i s
+  local panes width zoomed me active sel= key rest names i s n a
+  local -A alert
   tput civis
   # keys typed between reads would otherwise be echoed (^[[A)
   stty -echo
@@ -36,14 +37,24 @@ render() {
     (( panes > 1 )) || exit 0
     # resize-pane would unzoom the window, so skip while zoomed
     (( width == WIDTH || zoomed )) || tmux resize-pane -t "$TMUX_PANE" -x $WIDTH
-    mapfile -t names < <(tmux list-sessions -F '#{session_name}' | sort -f)
+    # Alert: session_alerts lists windows with a flag, e.g. "1!,2#" (! = bell)
+    names=() alert=()
+    while IFS=$'\t' read -r n a; do
+      names+=("$n")
+      [[ $a == *'!'* ]] && alert[$n]=1
+    done < <(tmux list-sessions -F $'#{session_name}\t#{session_alerts}' | sort -f)
     # without focus, or when the selected Session is gone, selection follows the current Session
     [[ $active == 1 && " ${names[*]} " == *" $sel "* && -n $sel ]] || sel=$me
     printf '\e[H\e[J'
     for i in "${!names[@]}"; do
       s=${names[i]}
       if [[ $s == "$sel" && $active == 1 ]]; then printf '\e[7m'; elif [[ $s == "$me" ]]; then printf '\e[1;35m'; fi
-      printf '%.*s\e[0m\n' $((WIDTH - 1)) "$s"
+      if [[ -n ${alert[$s]:-} ]]; then
+        # 2 columns for " ●"
+        printf '%.*s\e[0m \e[31m●\e[0m\n' $((WIDTH - 3)) "$s"
+      else
+        printf '%.*s\e[0m\n' $((WIDTH - 1)) "$s"
+      fi
     done
     # ponytail: Session names with spaces break the " name " membership test above
     IFS= read -rsn1 -t 1 key || continue

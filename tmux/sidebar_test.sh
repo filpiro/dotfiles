@@ -46,6 +46,16 @@ check "new Session appears within ~1s" 'wait_for "t capture-pane -p -t $pane | g
 t kill-session -t gamma
 check "killed Session disappears within ~1s" 'wait_for "! t capture-pane -p -t $pane | grep -q gamma"'
 
+# Alert: bell in a window nobody looks at (what notify.sh does: write to the pane tty)
+printf '\a' > "$(t display -p -t "$(sidebar_pane Alpha:1 ! | head -1)" '#{pane_tty}' | head -1)"
+check "bell in another Session shows a red dot" \
+  'wait_for "t capture-pane -p -e -t $pane | grep -q \"31m●\""'
+check "dot sits next to the right Session" \
+  '[[ $(t capture-pane -p -e -t "$pane" | grep "31m●") == *Alpha* ]]'
+t select-window -t Alpha:1
+check "visiting the window clears the dot" \
+  'wait_for "! t capture-pane -p -e -t $pane | grep -q \"31m●\""'
+
 t kill-pane -t "$(sidebar_pane Alpha:1)"
 check "killed Sidebar comes back" 'wait_for "[[ \$(sidebars Alpha:1) == 1 ]]"'
 
