@@ -25,3 +25,13 @@ run = "noop"
 on   = "?"
 run  = "help"
 desc = "Open help"
+
+[[mgr.prepend_keymap]]
+on   = "E"
+run  = "shell 'explorer.exe .' --orphan"
+desc = "Open cwd in Windows Explorer"
+
+[[mgr.prepend_keymap]]
+on   = "C"
+run  = "shell 'code .' --orphan"
+desc = "Open cwd in VS Code"

@@ -1,6 +1,11 @@
 [mgr]
 show_hidden = true
-ratio = [0, 1, 2]
+ratio = [0, 1, 0]
 
 [preview]
 wrap = "yes"
+
+# Enter on text files: nvim in a tmux popup over yazi.
+# Outside tmux, fall back to nvim in place.
+[opener]
+edit = [{ run = 'if [ -n "$TMUX" ]; then tmux display-popup -E -w 80% -h 90% nvim %s; else nvim %s; fi', desc = "nvim", block = true }
