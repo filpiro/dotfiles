@@ -26,10 +26,12 @@ autoload -Uz compinit
   local dump=${ZDOTDIR:-$HOME}/.zcompdump
   if [[ -n $dump(#qN.mh+24) ]]; then
     compinit -d $dump
-    { zcompile -R -- $dump.zwc $dump } &!
+    touch $dump  # compinit skips the write when nothing changed; reset the 24h clock.
   else
     compinit -C -d $dump
   fi
+  # Compile only when stale, in the foreground: background jobs from parallel shells raced on the .zwc.
+  [[ $dump.zwc -nt $dump ]] || zcompile -R -- $dump.zwc $dump 2>/dev/null
 }
 
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]-_}={[:upper:][:lower:]_-}' 'r:|=*' 'l:|=* r:|=*'
